@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -52,59 +52,60 @@ const useStyles = makeStyles((theme) => ({
 
 const Login = (props) => {
     const classes = useStyles();
-    const history = useHistory()
+    const history = useHistory();
 
     const [values, setValues] = useState({
         email: '',
         password: ''
-    })
+    });
 
     const regex = {
-        email: '^([a-z0-9_\.\+-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$', //eslint-disable-line
-        password: '(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,})$'
-    }
+        email: /^([a-z0-9_\.\+-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/i,
+        password: /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[\W_]).{6,}$/
+    };
 
     const [errorText, setErrorText] = useState({
         email: '',
         password: ''
-    })
+    });
 
     const validateInput = (name, input) => {
         if (name === 'email') {
             if (!input.match(regex.email))
-                setErrorText({ ...errorText, [name]: 'Invalid Email Id' })
-            else setErrorText({ ...errorText, [name]: '' })
+                setErrorText({ ...errorText, [name]: 'Invalid Email Id' });
+            else
+                setErrorText({ ...errorText, [name]: '' });
         }
         if (name === 'password') {
             if (!input.match(regex.password))
-                setErrorText({ ...errorText, [name]: 'Password must be Alphanumeric, Min. Length 6' })
-            else setErrorText({ ...errorText, [name]: '' })
+                setErrorText({ ...errorText, [name]: 'Password must be Alphanumeric with Special Character, Min. Length 6' });
+            else
+                setErrorText({ ...errorText, [name]: '' });
         }
-    }
-
+    };
 
     const handleChange = name => event => {
-        setValues({ ...values, [name]: event.target.value })
-        validateInput(name, event.target.value)
-    }
+        setValues({ ...values, [name]: event.target.value });
+        validateInput(name, event.target.value);
+    };
 
     const clickSubmit = (event) => {
         event.preventDefault();
         const user = {
             email: values.email || undefined,
             password: values.password || undefined
-        }
+        };
 
         props.loginCheck(user, function (token) {
             localStorage.setItem('token', token);
-            history.push("/")
-        })
-    }
+            history.push("/");
+        });
+    };
 
     return (
         <Grid container component="main" className={classes.root}>
             <CssBaseline />
-            <Grid item xs={false} sm={4} md={7} >
+            <Grid item xs={false} sm={4} md={7}>
                 <img src={process.env.PUBLIC_URL + '/assets/login.svg'} alt="login" />
             </Grid>
             <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -128,7 +129,7 @@ const Login = (props) => {
                             name="email"
                             autoComplete="email"
                             autoFocus
-                            error={errorText.email}
+                            error={!!errorText.email}
                         />
                         <TextField
                             variant="outlined"
@@ -142,17 +143,11 @@ const Login = (props) => {
                             onChange={handleChange('password')}
                             value={values.password}
                             autoComplete="current-password"
-                            error={errorText.password}
+                            error={!!errorText.password}
                         />
-                        {(errorText.email) ?
-                            <Alert className={classes.alert} severity="error">{errorText.email}</Alert> : <div></div>
-                        }
-                        {(errorText.password) ?
-                            <Alert className={classes.alert} severity="error">{errorText.password}</Alert> : <div></div>
-                        }
-                        {(props.error) ?
-                            <Alert className={classes.alert} severity="error">{props.error}</Alert> : <div></div>
-                        }
+                        {errorText.email && <Alert className={classes.alert} severity="error">{errorText.email}</Alert>}
+                        {errorText.password && <Alert className={classes.alert} severity="error">{errorText.password}</Alert>}
+                        {props.error && <Alert className={classes.alert} severity="error">{props.error}</Alert>}
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
@@ -164,7 +159,7 @@ const Login = (props) => {
                             color="primary"
                             className={classes.submit}
                             onClick={clickSubmit}
-                            disabled={(errorText.password || errorText.email) ? "true" : ""}
+                            disabled={!!errorText.password || !!errorText.email}
                         >
                             Sign In
                         </Button>
@@ -185,18 +180,18 @@ const Login = (props) => {
             </Grid>
         </Grid>
     );
-}
+};
 
 const mapStateToProps = state => {
     return {
         resume: state.resume,
         token: state.resume.token,
         error: state.resume.error,
-    }
-}
+    };
+};
 
 const mapDispatchToProps = dispatch => ({
-    loginCheck: (props, callback) => { dispatch(loginCheck(props, callback)) },
+    loginCheck: (props, callback) => { dispatch(loginCheck(props, callback)); },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

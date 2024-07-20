@@ -52,63 +52,42 @@ const Home = (props) => {
                         </div>
                         <br></br>
                         <div>
-                            <button className="btn btn-primary btn-lg" onClick={handleClick}>BUILD MY RESUME</button>
+                            <button className="btn btn-primary btn-lg" style={{ backgroundColor: "#fe8c26"}} onClick={handleClick}>BUILD MY RESUME</button>
                         </div>
                     </div>
-
-                    <div className="col-sm right ">
-                        <img src={publicURL + "/assets/resume.png"} alt=" resume" />
-                    </div>
-                </section>
-
-                <section className="start ">
-
-                    <div className="start-heading ">
-                        <span >How to Start?</span>
-                    </div>
-
-
-
-                    <div className="content row align-content-center">
-
-                        <div className="card-wrapper  col-sm">
-
-                            <div className="card">
-                                <div className="card-heading">1</div>
-                                <div className="card-body">
-                                    <h5 className="card-title">Fill the form</h5>
-                                    <p className="card-text">Fill out your details in <strong>6</strong> easy steps</p>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card-wrapper col-sm">
-
-                            <div className="card">
-                                <div className="card-heading">2</div>
-                                <div className="card-body">
-                                    <h5 className="card-title">Choose template</h5>
-                                    <p className="card-text">Choose a template from  provided templates</p>
-
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div className="card-wrapper col-sm">
-                            <div className="card col-md">
-                                <div className="card-heading">3</div>
-                                <div className="card-body">
-                                    <h5 className="card-title">Download Resume</h5>
-                                    <p className="card-text">That's it! Now you can download your resume in pdf form</p>
-
-                                </div>
-                            </div>
-                        </div>
-
+                    <div className="col-sm right new">
+                        <img src={publicURL + "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/283685515/original/6f5fe15ac6cc54febe1db87fdf89c17fdae2a01e/write-a-professional-resume-and-cv.jpg"} alt=" resume" />
                     </div>
                 </section>
+                <section className="start1">
+                <div className="start-heading1">
+    <span>How to Start?</span>
+  </div>
+  <div className="new2">
+    <div className="new1">
+      <div className="card-heading">1</div>
+      <div className="card-body">
+        <h5 className="card-title">Fill the form</h5>
+        <p className="card-text">Fill out your details in <strong>6</strong> easy steps</p>
+      </div>
+    </div>
+    <div className="new1 new4">
+      <div className="card-heading">2</div>
+      <div className="card-body">
+        <h5 className="card-title">Choose template</h5>
+        <p className="card-text">Choose a template from provided templates</p>
+      </div>
+    </div>
+    <div className="new1 new3">
+      <div className="card-heading">3</div>
+      <div className="card-body">
+        <h5 className="card-title">Download Resume</h5>
+        <p className="card-text">That's it! Now you can download your resume in pdf form</p>
+      </div>
+    </div>
+  </div>
+</section>
+               
 
                 <section className="features ">
 

@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,9 +9,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom";
 import Alert from '@material-ui/lab/Alert';
-import { config } from '../config/config.js';
+import { config } from '../config/config.js';  // Ensure correct import path
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -19,6 +19,10 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        padding:'30px',
+        border:'0.25px solid blue',
+        boxShadow: '2px 2px 5px rgba(0,0.75,0.75,0.75)',
+        borderRadius:'20px',
     },
     avatar: {
         margin: theme.spacing(1),
@@ -27,9 +31,14 @@ const useStyles = makeStyles((theme) => ({
     form: {
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing(3),
+
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+        backgroundColor: '#fe8c26',
+        '&:hover': {
+            backgroundColor: '#fe8c26',
+        },
     },
     alert: {
         padding: '0px',
@@ -48,49 +57,60 @@ export default function Signup() {
         email: '',
         open: false,
         error: ''
-    })
-
-    const regex = {
-        email: '^([a-z0-9_\.\+-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$', //eslint-disable-line
-        name: '^[A-Z][a-zA-Z]{1,}$',
-        password: '(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,})$'
-    }
+    });
 
     const [errorText, setErrorText] = useState({
         email: '',
         lastName: '',
         firstName: '',
         password: ''
-    })
+    });
+
+    const regex = {
+        email: /^([a-zA-Z0-9_\.\+-]+)@([a-zA-Z\d\.-]+)\.([a-zA-Z]{2,6})$/,
+        name: /^[A-Za-z]{2,}$/,
+        password: /^(?=.*\d)(?=.*[a-zA-Z]).{6,}$/
+    };
 
     const validateInput = (name, input) => {
-        if (name === 'firstName' || name === 'lastName') {
-            if (!input.match(regex.name))
-                setErrorText({ ...errorText, [name]: 'Invalid Name; Length > 2' })
-            else setErrorText({ ...errorText, [name]: '' })
+        switch (name) {
+            case 'firstName':
+            case 'lastName':
+                if (!input.match(regex.name)) {
+                    setErrorText({ ...errorText, [name]: 'Invalid Name; Length > 2' });
+                } else {
+                    setErrorText({ ...errorText, [name]: '' });
+                }
+                break;
+            case 'email':
+                if (!input.match(regex.email)) {
+                    setErrorText({ ...errorText, [name]: 'Invalid Email Id' });
+                } else {
+                    setErrorText({ ...errorText, [name]: '' });
+                }
+                break;
+            case 'password':
+                if (!input.match(regex.password)) {
+                    setErrorText({ ...errorText, [name]: 'Password must be Alphanumeric, Min. Length 6' });
+                } else {
+                    setErrorText({ ...errorText, [name]: '' });
+                }
+                break;
+            default:
+                break;
         }
-        if (name === 'email') {
-            if (!input.match(regex.email))
-                setErrorText({ ...errorText, [name]: 'Invalid Email Id' })
-            else setErrorText({ ...errorText, [name]: '' })
-        }
-        if (name === 'password') {
-            if (!input.match(regex.password))
-                setErrorText({ ...errorText, [name]: 'Password must be Alphanumeric, Min. Length 6' })
-            else setErrorText({ ...errorText, [name]: '' })
-        }
-    }
+    };
 
     const handleChange = name => event => {
-        setValues({ ...values, [name]: event.target.value })
-        validateInput(name, event.target.value)
-    }
+        setValues({ ...values, [name]: event.target.value });
+        validateInput(name, event.target.value);
+    };
 
     const goto = (res, user) => {
         if (res.status === 200) {
-            history.push("/login", user)
+            history.push("/login", user);
         }
-    }
+    };
 
     const create = async (user) => {
         try {
@@ -100,35 +120,47 @@ export default function Signup() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(user)
-            })
-            let res = await response.json()
-            //console.log(res)
-            goto(response, res.user)
-            return response
+            });
+
+            if (!response.ok) {
+                const errorDetails = await response.text(); // Capture error details
+                throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
+            }
+
+            let res = await response.json();
+            goto(response, res.user);
+            return response;
         } catch (err) {
-            console.log(err)
+            console.error('Error during signup:', err);
+            setValues({ ...values, error: err.message });
         }
-    }
+    };
 
     const clickSubmit = (event) => {
         event.preventDefault();
         const user = {
-            firstName: values.firstName || undefined,
-            lastName: values.lastName || undefined,
-            email: values.email || undefined,
-            password: values.password || undefined
-        }
+            firstName: values.firstName.trim(),
+            lastName: values.lastName.trim(),
+            email: values.email.trim(),
+            password: values.password.trim()
+        };
+
         create(user).then((data) => {
-            if (data.error) {
-                setValues({ ...values, error: data.error })
+            if (data && data.error) {
+                setValues({ ...values, error: data.error });
             } else {
-                setValues({ ...values, error: '', open: true })
+                setValues({ ...values, error: '', open: true });
             }
-        })
-    }
+        });
+    };
+
+    const isFormValid = () => {
+        return !errorText.firstName && !errorText.lastName && !errorText.email && !errorText.password &&
+               values.firstName.trim() && values.lastName.trim() && values.email.trim() && values.password.trim();
+    };
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" >
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
@@ -150,9 +182,10 @@ export default function Signup() {
                                 onChange={handleChange('firstName')}
                                 value={values.firstName}
                                 label="First Name"
-                                error={errorText.firstName}
+                                error={!!errorText.firstName}
                                 autoFocus
                             />
+                            {errorText.firstName && <Alert className={classes.alert} severity="error">{errorText.firstName}</Alert>}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -165,8 +198,9 @@ export default function Signup() {
                                 label="Last Name"
                                 name="lastName"
                                 autoComplete="lastName"
-                                error={errorText.lastName}
+                                error={!!errorText.lastName}
                             />
+                            {errorText.lastName && <Alert className={classes.alert} severity="error">{errorText.lastName}</Alert>}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -179,8 +213,9 @@ export default function Signup() {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
-                                error={errorText.email}
+                                error={!!errorText.email}
                             />
+                            {errorText.email && <Alert className={classes.alert} severity="error">{errorText.email}</Alert>}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -194,30 +229,19 @@ export default function Signup() {
                                 onChange={handleChange('password')}
                                 value={values.password}
                                 autoComplete="current-password"
-                                error={errorText.password}
+                                error={!!errorText.password}
                             />
+                            {errorText.password && <Alert className={classes.alert} severity="error">{errorText.password}</Alert>}
                         </Grid>
                     </Grid>
-                    {(errorText.firstName) ?
-                        <Alert className={classes.alert} severity="error">{errorText.firstName}</Alert> : <div></div>
-                    }
-                    {(errorText.lastName) ?
-                        <Alert className={classes.alert} severity="error">{errorText.lastName}</Alert> : <div></div>
-                    }
-                    {(errorText.email) ?
-                        <Alert className={classes.alert} severity="error">{errorText.email}</Alert> : <div></div>
-                    }
-                    {(errorText.password) ?
-                        <Alert className={classes.alert} severity="error">{errorText.password}</Alert> : <div></div>
-                    }
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
-                        color="primary"
                         className={classes.submit}
-                        disabled={(errorText.firstName || errorText.lastName || errorText.password || errorText.email) ? "true" : ""}
+                        disabled={!isFormValid()}
                         onClick={clickSubmit}
+                        
                     >
                         Sign Up
                     </Button>
@@ -228,6 +252,7 @@ export default function Signup() {
                             </Link>
                         </Grid>
                     </Grid>
+                    {values.error && <Alert severity="error">{values.error}</Alert>}
                 </form>
             </div>
         </Container>
